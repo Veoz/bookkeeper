@@ -1,0 +1,5 @@
+name: Bookkeeper
+type: module
+description: Module for bookkeepers.
+package: bookkeeper
+core: 8.x

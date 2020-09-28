@@ -1,0 +1,13 @@
+<?php
+
+function bookkeeper_theme($existing, $type, $theme, $path) {
+  return [
+    'bookkeeper_theme' => [
+      'variables' => [
+        'run_render' => 'run_render',
+        'base_url' => 'base_url',
+      ],
+    ],
+  ];
+
+}

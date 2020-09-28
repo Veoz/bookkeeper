@@ -1,0 +1,7 @@
+lendos.first_page:
+  path: '/tables'
+  defaults:
+    _controller: 'Drupal\bookkeeper\Controller\Table_rr::table_render'
+    _title: 'Count table for bookkeepers'
+  requirements:
+    _access: 'TRUE'
