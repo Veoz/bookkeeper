@@ -13,21 +13,18 @@ class TableGenerate extends FormBase {
   }
   
   public function buildForm(array $form, FormStateInterface $form_state) {
-    
     $form['#prefix'] = "<div id='test_test'>";
     $form['#suffix'] = "</div>";
-    
     if ($form_state->get('last_table_name')) {
       if ($form_state->getTriggeringElement()['#name'] == "add_table") {
         $last_table_name = $form_state->getTriggeringElement(
           )['#last_table_name'] + 1;
         $form_state->set("last_table_name", $last_table_name);
       }
-    } else {
+    }
+    else {
       $form_state->set("last_table_name", 100500);
     }
-    
-    
     if ($form_state->getValue('100500')) {
       $order_list = [];
       for ($n = 100500; $n <= $form_state->get('last_table_name'); $n++) {
@@ -52,30 +49,37 @@ class TableGenerate extends FormBase {
         'wrapper' => 'test_test',
       ],
     ];
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#name' => 'run',
+      '#value' => 'Submit',
+    ];
     return $form;
   }
   
   public function validateForm(array &$form, FormStateInterface $form_state) {
+  
+  $test = $form_state->getValue('100500');
+  
   }
   
   public function submitForm(array &$form, FormStateInterface $form_state) {
   }
   
-  
   public function tableSkeleton($form, $form_state) {
     $first_table = 100500;
-//    $new_year = 1;
     $orders = $form_state->get('order_list');
     $i = 0;
     foreach ($orders as $table_set => $field_set) {
-      if ($field_set == FALSE) $field_set ++;
+      if ($field_set == FALSE) {
+        $field_set++;
+      }
       $new_year = $field_set; //!!!
       $table_name = $first_table + $i;
       $actions_name = 'actions_' . $table_name;
       if ($form_state->getTriggeringElement()['#name'] == "add_year{$i}") {
         $new_year = $form_state->getTriggeringElement()['#add_field'] + 1;//!!!
       }
-      
       $form[$actions_name]['button'] = [
         '#type' => 'button',
         '#name' => 'add_year' . $i,
@@ -110,11 +114,7 @@ class TableGenerate extends FormBase {
           t('YTD'),
         ],
       ];
-      
-    
-      
       $year = date('Y');
-      
       for ($coll = 1; $coll <= $add_field; $coll++) {
         $index = $coll - 1;
         $form[$table_name][$index]['year'] = [
@@ -123,6 +123,7 @@ class TableGenerate extends FormBase {
           '#value' => $year,
           '#attributes' => [
             'readonly' => 'readonly',
+            'class' => ['year'],
           ],
         ];
         $year--;
@@ -153,12 +154,10 @@ class TableGenerate extends FormBase {
               $isYTD
             ) == 'YTD') {
             $form[$table_name][$index][$months] = [
-              '#type' => 'textfield',
+              '#type' => 'number',
               '#required' => FALSE,
-              '#value' => $months,
-              '#name' => $months,
               '#attributes' => [
-                'readonly' => 'readonly',
+                'class' => ['reports'],
               ],
             ];
           }
@@ -166,16 +165,15 @@ class TableGenerate extends FormBase {
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
-              '#name' => $months,
             ];
           }
         }
       }
       $i++;
     }
-    
     return $form;
   }
+  
   public function ajaxSubmitCallback(
     array &$form,
     FormStateInterface $form_state

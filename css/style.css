@@ -1,20 +1,31 @@
 div.runer form td div{
-  width: 70px;
+  width: 50px;
   margin: 0;
 }
+
 div.runer form td{
   box-sizing: border-box;
 }
 div.runer form th{
   text-align: center;
 }
-div.runer form td div input[type=text]{
-  background: #757575;
+div.runer form td div input.reports{
+  background: #818181;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+  border: 2px solid black;
+
+
+}
+
+div.runer form td div input.year {
+  background: #818181;
   color: #FFFFFF;
   font-weight: 700;
   font-size: 14px;
   text-align: center;
-
 }
 div.runer form td div input{
   padding: 6px;
