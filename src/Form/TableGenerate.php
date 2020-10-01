@@ -59,8 +59,18 @@ class TableGenerate extends FormBase {
   
   public function validateForm(array &$form, FormStateInterface $form_state) {
   
-  $test = $form_state->getValue('100500');
   
+  $orders = $form_state->get('order_list');
+  $i = 0;
+  $a = [];
+  foreach($orders as $order => $val){
+    $name = 100500 + $i;
+    $test = $form_state->getValue($name);
+    foreach ($test as $item) {
+      $a[] = [$name => $item];
+    }
+    $i++;
+  }
   }
   
   public function submitForm(array &$form, FormStateInterface $form_state) {
