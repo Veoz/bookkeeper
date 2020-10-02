@@ -30,7 +30,7 @@ class TableGenerate extends FormBase {
       for ($n = 100500; $n <= $form_state->get('last_table_name'); $n++) {
         $test = $form_state->getValue($n);
         $form_current_fields = count($test);
-        array_push($order_list, $form_current_fields);
+        $order_list[] = $form_current_fields;
       }
     }
     else {
@@ -57,6 +57,7 @@ class TableGenerate extends FormBase {
     return $form;
   }
   
+  
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $year = [
       'jan',
@@ -72,55 +73,95 @@ class TableGenerate extends FormBase {
       'nov',
       'dec',
     ];
-    $q1 = ['jan','feb','mar'];
-    $q2 = ['apr','may','jun'];
-    $q3 = ['jul','aug','sep'];
-    $q4 = ['oct','nov','dec'];
-// Loop for all months
-// we find empty inputs in table
-    foreach($year as $q ){
-     // we take one input from table
-      $val =  $form['100500'][0][$q]['#value'];
-     //And check! it is empty or not.
-     if ($val != false){
-       //if not -> add to array!
-       $chek_period[] = $q;
+    
+    $orders = $form_state->get('order_list');
+    $fixik  = array_key_last($orders);
+   $orders[$fixik]++;
+    $chek_period = [];
+    foreach ($orders as $tables => $row) {
+      if ($row == 0) {
+        $row++;
       }
-     }
-    //$check_period is contains index => value;
-    //where index is (int) => value is name of month (string) 
-    $month_input = count($chek_period);
-    //if empty months exists -> we go to check periods!
-    if ($month_input != 12){
-      $diff = array_diff($year,$chek_period);
-      // function array_diff returns array of empty fields(months)
-      $valid_period = array_slice($year,  0 , $month_input);
-      //$valid_period - contains ordered list of months.
-      // We ned to swap value with key for start validation.
-      array_flip($valid_period);
-      //$test returns name of the missed month or empty array.
-      $test = array_diff($valid_period,$chek_period);
-      if ($test != false){
-        $error = 'Invalid';
-      }else{
-        $error = 'Valid';
+      for ($i = 0; $i < $row; $i++) {
+        foreach ($year as $q) {
+          // we take one input from table
+          $val = $form['100500'][$i][$q]['#value'];
+          //And check! it is empty or not.
+          
+          if ($val != '') {
+            //if not -> add to array!
+            $chek_period[] = $q;
+            
+          }
+          else {
+            continue;
+          }
+        }
       }
+      //$check_period is contains index => value;
+      //where index is (int) => value is name of month (string)
+      $month_input = count($chek_period);
+      
+      // we find first and last months input
+      $run = $chek_period;
+      $start = array_shift($run);
+      $finish = array_pop($run);
+      
+      //if empty months > 1 -> we go to check periods!
+      if ($start != 'dec') {
+        //start creating validate Pattern (array)
+        //step one - cut start of array ($start = first input months)
+        $un_valid_months = array_search($start, $year);
+        //$un_valid_months contains array, without empty field from start year
+        $start_valid_period = array_slice($year, $un_valid_months);
+        
+        //stet two - cut end of array
+        //We use number of count of input months for cut end from array
+        $valid_period = array_slice($start_valid_period, 0, $month_input);
+        
+        //$valid_period - contains ordered list of months.
+        // We ned to swap value with key for start validation.
+        array_flip($valid_period);
+        
+        //$test returns name of the missed month or false.
+        $test = array_diff($valid_period, $chek_period);
+        if ($test != FALSE) {
+          $valid = FALSE;
+          $form_state->setErrorByName('error', $this->t('Invalid'));
+          $break = TRUE;
+        }
+        else {
+          $pattern[] = $valid_period;
+          $valid1 = TRUE;
+        }
+      }
+      else {
+        $valid2 = TRUE;
+        $pattern[] = 'dec';
+      }
+      
+      
+      // Loop for all months
+      // we find empty inputs in table
+      
+      
     }
-  
-  
     $form['100500'][0]['jan']['#value'];
-  
-//  $check_periods = $form_state->getValue('100500');
-// foreach ($check_periods as $period){
-//   $a =  $period;
-//  // in_array();
-// }
-//  $month = $check_period[0]['jan'];
-  
-  
+    
+    //  $check_periods = $form_state->getValue('100500');
+    // foreach ($check_periods as $period){
+    //   $a =  $period;
+    //  // in_array();
+    // }
+    //  $month = $check_period[0]['jan'];
+    
+    
   }
   
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->get('success')) {
+      \Drupal::messenger()->addMessage($this->t("Valid!"), 'status');
+    }
   }
   
   public function tableSkeleton($form, $form_state) {

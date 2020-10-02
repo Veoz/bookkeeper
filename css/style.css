@@ -31,3 +31,10 @@ div.runer form td div input{
   padding: 6px;
   margin: 0;
 }
+input{
+   -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
