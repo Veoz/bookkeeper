@@ -6,12 +6,12 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 class TableGenerate extends FormBase {
-  
-  
+
+
   public function getFormID() {
     return 'run_render';
   }
-  
+
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#prefix'] = "<div id='test_test'>";
     $form['#suffix'] = "</div>";
@@ -56,8 +56,8 @@ class TableGenerate extends FormBase {
     ];
     return $form;
   }
-  
-  
+
+
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->getTriggeringElement()['#name'] == "run") {
       $year = [
@@ -74,7 +74,7 @@ class TableGenerate extends FormBase {
         'nov',
         'dec',
       ];
-      
+
       for ($n = 100500; $n <= $form_state->getValue("$n"); $n++) {
         if (!$form_state->getValue("$n")) {
           break;
@@ -88,40 +88,35 @@ class TableGenerate extends FormBase {
       }
       $table_start = 100500;
       $years_period = [];
-      
+      $chek_period = [];
       foreach ($orders as $tables => $row) {
-        $chek_period = [];
         for ($i = 0; $i < $row; $i++) {
           foreach ($year as $q) {
             $val = $form["100500"]["$i"][$q]['#value'];
-            if ($val === '') {
-              continue;
-            }
-            else {
-              $chek_period1[] = $q;
-              $years_to_string = $form["100500"]["$i"]['year']['#value'];
-              
-              if (isset($years_period["$i"]) and $years_period["$i"] != "$years_to_string") {
-                $years_period["$i"] = "$years_to_string";
-                $years_period = array_unique($years_period);
-              }
-            
-             
-            }
-            if ($table_start > 100500) {
-              $val = $form["$table_start"]["$i"][$q]['#value'];
               if ($val === '') {
                 continue;
-              }
-              else {
+              }else{
                 $chek_period[] = $q;
-                $years_to_string = $form["$table_start"]["$i"]['year']['#value'];
-                if ($i > $row or $years_period == FALSE or $years_period["$i"] !== "$years_to_string") {
+                $years_to_string = $form["100500"]["$i"]['year']['#value'];
+
+                if (isset($years_period["$i"]) AND $years_period["$i"] != "$years_to_string"){
                   $years_period["$i"] = "$years_to_string";
                   $years_period = array_unique($years_period);
                 }
               }
-            }
+              if ($table_start > 100500){
+                $val = $form["$table_start"]["$i"][$q]['#value'];
+                if ($val === '') {
+                  continue;
+                }else{
+                  $chek_period[] = $q;
+                  $years_to_string = $form["$table_start"]["$i"]['year']['#value'];
+                  if ( $i > $row OR $years_period == FALSE OR $years_period["$i"] !== "$years_to_string"){
+                    $years_period["$i"] = "$years_to_string";
+                    $years_period = array_unique($years_period);
+                  }
+                }
+              }
           }
         }
         if ($row > 1) {
@@ -130,11 +125,8 @@ class TableGenerate extends FormBase {
             $year[] = $year[$m];
           }
         }
-        if ($chek_period == FALSE) {
-          $form_state->setErrorByName(
-            'error',
-            $this->t('Invalid empty Check-period!!!!')
-          );
+        if ($chek_period == FALSE){
+          $form_state->setErrorByName('error', $this->t('Invalid empty Check-period!!!!'));
         }
         $month_input = count($chek_period);
         $run = $chek_period;
@@ -149,65 +141,60 @@ class TableGenerate extends FormBase {
           $valid_period = array_slice($start_valid_period, 0, $month_input);
           array_flip($valid_period);
           $years_list = array_unique($years_period);
-          if (isset($years_pattern) && isset($months_pattern)) {
+          if (isset($years_pattern)) {
             $validate_years = array_diff($years_pattern, $years_list);
             if ($validate_years == TRUE) {
               $form_state->setErrorByName('error', $this->t('Invalid years'));
               $years_error = "Error";
               break;
             }
+          }
+          if (isset($months_pattern)) {
             $validate_months = array_diff_assoc($months_pattern, $chek_period);
-            if ($validate_months == TRUE) {
+            if ($validate_months == TRUE){
               $form_state->setErrorByName('error', $this->t('Invalid months'));
               $months_error = "Error";
               break;
             }
-          }else{
-            $test = array_diff_assoc($valid_period, $chek_period);
-            if ($test == FALSE) {
-              $months_pattern = $valid_period;
-              $years_pattern = $years_list;
-              $create_patterns = TRUE;
-             
-            }
-            else {
-              $valid = FALSE;
-              $form_state->setErrorByName(
-                'error',
-                $this->t('Invalid pre pattern')
-              );
-              $break = TRUE;
           }
-          
+          $test = array_diff_assoc($valid_period, $chek_period);
+          if ($test == FALSE) {
+            $months_pattern = $valid_period;
+            $years_pattern = $years_list;
+            $create_patterns = TRUE;
+          }
+          else {
+          $valid = FALSE;
+          $form_state->setErrorByName('error', $this->t('Invalid pre pattern'));
+          $break = TRUE;
             //$form_state->set('success', TRUE);
           }
-          $chek_period = [];
         }
         $table_start++;
-        unset($chek_period);
+      $chek_period = [];
       }
-      if ($form_state->hasAnyErrors()) {
+      if ($form_state->hasAnyErrors() ){
         $form_state->set('success', TRUE);
       }
     }
     $form['100500'][0]['jan']['#value'];
-    
+
     //  $check_periods = $form_state->getValue('100500');
     // foreach ($check_periods as $period){
     //   $a =  $period;
     //  // in_array();
     // }
     //  $month = $check_period[0]['jan'];
-    
-    
+
+
   }
-  
+
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->get('success')) {
       \Drupal::messenger()->addMessage($this->t("Valid!"), 'status');
     }
   }
-  
+
   public function tableSkeleton($form, $form_state) {
     $first_table = 100500;
     $orders = $form_state->get('order_list');
@@ -315,14 +302,14 @@ class TableGenerate extends FormBase {
     }
     return $form;
   }
-  
+
   public function ajaxSubmitCallback(
     array &$form,
     FormStateInterface $form_state
   ) {
     return $form;
   }
-  
-  
+
+
 }
 

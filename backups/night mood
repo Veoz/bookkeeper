@@ -6,12 +6,12 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 class TableGenerate extends FormBase {
-  
-  
+
+
   public function getFormID() {
     return 'run_render';
   }
-  
+
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#prefix'] = "<div id='test_test'>";
     $form['#suffix'] = "</div>";
@@ -56,8 +56,8 @@ class TableGenerate extends FormBase {
     ];
     return $form;
   }
-  
-  
+
+
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->getTriggeringElement()['#name'] == "run") {
       $year = [
@@ -74,7 +74,7 @@ class TableGenerate extends FormBase {
         'nov',
         'dec',
       ];
-      
+
       for ($n = 100500; $n <= $form_state->getValue("$n"); $n++) {
         if (!$form_state->getValue("$n")) {
           break;
@@ -88,7 +88,7 @@ class TableGenerate extends FormBase {
       }
       $table_start = 100500;
       $years_period = [];
-      
+
       foreach ($orders as $tables => $row) {
         $chek_period = [];
         for ($i = 0; $i < $row; $i++) {
@@ -98,15 +98,18 @@ class TableGenerate extends FormBase {
               continue;
             }
             else {
-              $chek_period1[] = $q;
+              $chek_period[] = $q;
               $years_to_string = $form["100500"]["$i"]['year']['#value'];
-              
+
               if (isset($years_period["$i"]) and $years_period["$i"] != "$years_to_string") {
                 $years_period["$i"] = "$years_to_string";
                 $years_period = array_unique($years_period);
               }
-            
-             
+
+
+
+
+
             }
             if ($table_start > 100500) {
               $val = $form["$table_start"]["$i"][$q]['#value'];
@@ -168,7 +171,7 @@ class TableGenerate extends FormBase {
               $months_pattern = $valid_period;
               $years_pattern = $years_list;
               $create_patterns = TRUE;
-             
+
             }
             else {
               $valid = FALSE;
@@ -178,7 +181,7 @@ class TableGenerate extends FormBase {
               );
               $break = TRUE;
           }
-          
+
             //$form_state->set('success', TRUE);
           }
           $chek_period = [];
@@ -191,23 +194,23 @@ class TableGenerate extends FormBase {
       }
     }
     $form['100500'][0]['jan']['#value'];
-    
+
     //  $check_periods = $form_state->getValue('100500');
     // foreach ($check_periods as $period){
     //   $a =  $period;
     //  // in_array();
     // }
     //  $month = $check_period[0]['jan'];
-    
-    
+
+
   }
-  
+
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->get('success')) {
       \Drupal::messenger()->addMessage($this->t("Valid!"), 'status');
     }
   }
-  
+
   public function tableSkeleton($form, $form_state) {
     $first_table = 100500;
     $orders = $form_state->get('order_list');
@@ -315,14 +318,14 @@ class TableGenerate extends FormBase {
     }
     return $form;
   }
-  
+
   public function ajaxSubmitCallback(
     array &$form,
     FormStateInterface $form_state
   ) {
     return $form;
   }
-  
-  
+
+
 }
 
