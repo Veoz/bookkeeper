@@ -221,8 +221,6 @@ class TableGenerate extends FormBase {
             $q_values = [$q1_values, $q2_values, $q3_values, $q4_values,];
             
             foreach ($q_values as $lava) {
-              //              $res[] = $lava;
-              
               $get_q = $form["100500"]["$i"]["Q"."$counter"]['#value'];
               $a_lava_q[] = [$lava,$get_q];
 //              if ($lava === [] || $get_q === ''){
@@ -232,10 +230,28 @@ class TableGenerate extends FormBase {
                 }
               }else{
                 $start_count_q = array_sum($lava);
-                $mid_count_q = (($start_count_q)+1)/3;
-                $end_count_q = round($mid_count_q, 2);
-                $start_check_q = $end_count_q - $get_q;
-                $a_ress[] = $start_check_q;
+                if ($get_q == 0.00 || $start_count_q == 0){
+                  $end_count_q = 0;
+                }else{
+                 
+                  $mid_count_q = (($start_count_q)+1)/3;
+                  $end_count_q = round($mid_count_q, 2);
+                }
+                $start_check_q = $get_q - $end_count_q;
+                $mid_check_q =round($start_check_q , 2);
+                
+                if ($mid_check_q != 0) {
+                  $min = $end_count_q - 0.05;
+                  $max = $end_count_q + 0.05;
+                  $aaa_ress[] = [$min, $max];
+                  if ($get_q < $min || $get_q > $max ){
+                      $form_state->setErrorByName(
+                        'error',
+                        $this->t('Invalid! end count!')
+                      );
+                 }
+                }
+                $a_ress[] = $mid_check_q;
               }
               
               $counter++;
