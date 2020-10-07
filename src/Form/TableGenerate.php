@@ -310,26 +310,48 @@ class TableGenerate extends FormBase {
           'Q4',
           'YTD',
         ];
+        $b = 1;
+        $qtd = 1;
         foreach ($seasons as $months) {
+          
+          
           $isQ = 'Q';
           $isYTD = 'YTD';
-          if (stristr($months, $isQ) != FALSE || stristr(
-              $months,
-              $isYTD
-            ) == 'YTD') {
+          if (stristr($months, $isQ) != FALSE){
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
               '#attributes' => [
-                'class' => ['reports'],
+                'class' => ['reports','qtd-input'],
+                'data-qtd' => $months,
               ],
+              '#step' => '0.01',
             ];
+            $b++;
+            $qtd++;
           }
-          else {
+          elseif(stristr($months,$isYTD) == 'YTD')  {
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
+              '#attributes' => [
+                'class' => ['reports', 'year-input', ],
+              ],
+              '#step' => '0.01',
             ];
+            $b++;
+          }else{
+            $form[$table_name][$index][$months] = [
+              '#type' => 'number',
+              '#required' => FALSE,
+              '#attributes' => [
+               'class' => ['month-input'],
+               'data-month' => $b,
+               'data-qtd' => 'Q' . $qtd,
+            ],
+              '#step' => '0.01',
+            ];
+            $b++;
           }
         }
       }
