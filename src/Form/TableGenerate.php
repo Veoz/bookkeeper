@@ -60,7 +60,7 @@ class TableGenerate extends FormBase {
   
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->getTriggeringElement()['#name'] == "run") {
-      $year = [
+      $year_start = [
         'jan',
         'feb',
         'mar',
@@ -88,21 +88,7 @@ class TableGenerate extends FormBase {
       }
       $table_start = 100500;
       foreach ($orders as $tables => $row) {
-
-        $year = [
-          'jan',
-          'feb',
-          'mar',
-          'apr',
-          'may',
-          'jun',
-          'jul',
-          'aug',
-          'sep',
-          'oct',
-          'nov',
-          'dec',
-        ];
+        $year = $year_start;
         for ($i = 0; $i < $row; $i++) {
           foreach ($year as $q) {
             if ($table_start == 100500) {
@@ -114,7 +100,7 @@ class TableGenerate extends FormBase {
                 $pattern_period[] = $q;
                 $years_to_string = $form["100500"]["$i"]['year']['#value'];
                 $years_period["$i"] = "$years_to_string";
-                $audit_false_ye[] = [$table_start => $years_period];
+                $start_value_write[] = $val;
               }
             }
             if ($table_start > 100500) {
@@ -126,7 +112,6 @@ class TableGenerate extends FormBase {
                 $chek_period[] = $q;
                 $years_to_string = $form["$table_start"]["$i"]['year']['#value'];
                 $years_period["$i"] = "$years_to_string";
-                $audit_true_ye[] = [$table_start => $years_period];
               }
             }
           }
@@ -137,8 +122,7 @@ class TableGenerate extends FormBase {
             $year[] = $year[$m];
           }
         }
-        
-        if (isset($pattern_period) && $pattern_period != FALSE){
+        if (isset($pattern_period) && $pattern_period != FALSE) {
           $pattern_input = count($pattern_period);
           $chek_period = $pattern_period;
         }
@@ -146,10 +130,10 @@ class TableGenerate extends FormBase {
         if ($test123 === FALSE) {
           $form_state->setErrorByName(
             'error',
-            $this->t('Invalid empty Check-period!!!!'));
+            $this->t('Invalid empty Check-period!!!!')
+          );
           return;
         }
-        
         $month_input = count($chek_period);
         $run = $chek_period;
         $start = array_shift($run);
@@ -157,43 +141,32 @@ class TableGenerate extends FormBase {
         $un_valid_months = array_search($start, $year);
         $start_valid_period = array_slice($year, $un_valid_months);
         $valid_period = array_slice($start_valid_period, 0, $month_input);
-//        $auditor_un_flipp[] = [ $table_start => $valid_period];
-//        $audit_flip = array_flip($valid_period);
-//        $auditor_flip_on[] = [ $table_start => $valid_period];
         $years_list = array_unique($years_period);
-//        if (isset($years_pattern) && isset($months_pattern) && isset($pattern_input)) {
         if (isset($years_pattern, $months_pattern)) {
-          
-          if ($pattern_input != $month_input){
+          if ($pattern_input != $month_input) {
             $form_state->setErrorByName('error', $this->t('Invalid Count'));
           }
           $validate_years = array_diff_assoc($years_pattern, $years_list);
           $years_pattern_count = count($years_pattern);
           $list_years_count = count($years_list);
-          $auie_year[] =[$table_start => [$validate_years]];
-          $audir_arr_year[] = [$table_start =>[$years_pattern , $years_list]];
-//          if ($validate_years != FALSE ) {
           if (($years_pattern_count != $list_years_count) || $validate_years != FALSE) {
             $form_state->setErrorByName('error', $this->t('Invalid years'));
             $years_error = "Error";
-            //break;
-          }else{
+          }
+          else {
             $validate_months = array_diff_assoc($months_pattern, $chek_period);
-            $auditor_valid_assoc[] = [$table_start =>$validate_months];
             if ($validate_months != FALSE) {
               $form_state->setErrorByName('error', $this->t('Invalid months'));
               $months_error = "Error";
-              //break;
             }
           }
-          
         }
         else {
           $test = array_diff_assoc($valid_period, $chek_period);
           if ($test == FALSE && isset($pattern_period)) {
             $months_pattern = $valid_period;
             $years_pattern = $years_list;
-            $create_patterns = TRUE;
+//            $create_patterns = TRUE;
           }
           else {
             $valid = FALSE;
@@ -203,25 +176,90 @@ class TableGenerate extends FormBase {
             );
             $break = TRUE;
           }
-          //$form_state->set('success', TRUE);
         }
-        
         $chek_period = [];
         $years_period = [];
-        if (isset($pattern_period)){
+        if (isset($pattern_period)) {
+          $go_next_step = $pattern_period;
           unset($pattern_period);
         }
-//        $pattern_period = [];
-        $table_start ++;
+        $table_start++;
       }
       if (!$form_state->hasAnyErrors()) {
+        
+//        $a_start_count = $go_next_step;
+//        $a_start_months = $start_value_write;
+//        $i_months = 0;
+        $q1 = [$year_start[0],$year_start[1],$year_start[2], ];
+        $q2 = [$year_start[3],$year_start[4],$year_start[5], ];
+        $q3 = [$year_start[6],$year_start[7],$year_start[8], ];
+        $q4 = [$year_start[9],$year_start[10],$year_start[11], ];
+        $q1_values=[];
+        $q2_values=[];
+        $q3_values=[];
+        $q4_values=[];
+        foreach ($orders as $tables => $row) {
+          for ($i = 0; $i < $row; $i++) {
+            foreach ($year_start as $q) {
+              $val = $form["100500"]["$i"][$q]['#value'];
+              if ((array_search("$q" ,$q1))!==FALSE && $val != ''){
+                $q1_values[] =  $val;
+              }
+              if ((array_search("$q" ,$q2))!==FALSE && $val != ''){
+                $q2_values[] =  $val;
+              }
+              if ((array_search("$q" ,$q3))!==FALSE && $val != ''){
+                $q3_values[] =  $val;
+              }
+              if ((array_search("$q" ,$q4))!==FALSE && $val != ''){
+                $q4_values[] =  $val;
+              }
+              
+              $a_count_ytd = $form["100500"]["$i"]['YTD']['#value'];
+            }
+            $counter = 1;
+            $q_values = [$q1_values, $q2_values, $q3_values, $q4_values,];
+            
+            foreach ($q_values as $lava) {
+              //              $res[] = $lava;
+              
+              $get_q = $form["100500"]["$i"]["Q"."$counter"]['#value'];
+              $a_lava_q[] = [$lava,$get_q];
+//              if ($lava === [] || $get_q === ''){
+              if ($lava === [] ){
+                if ( $get_q !== ''){
+                  $form_state->setErrorByName('error',$this->t('Invalid! Count false!'));
+                }
+              }else{
+                $start_count_q = array_sum($lava);
+                $mid_count_q = (($start_count_q)+1)/3;
+                $end_count_q = round($mid_count_q, 2);
+                $start_check_q = $end_count_q - $get_q;
+                $a_ress[] = $start_check_q;
+              }
+              
+              $counter++;
+            }
+            
+          
+            
+          }
+        }
+        
+        
         $form_state->set('success', TRUE);
-      }else{
-        $form_state->setErrorByName('error',$this->t('Invalid else')
+      }
+      else {
+        $form_state->setErrorByName(
+          'error',
+          $this->t('Invalid else')
         );
+        
+        
+        
+        
       }
     }
-    $form['100500'][0]['jan']['#value'];
   }
   
   public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -313,16 +351,14 @@ class TableGenerate extends FormBase {
         $b = 1;
         $qtd = 1;
         foreach ($seasons as $months) {
-          
-          
           $isQ = 'Q';
           $isYTD = 'YTD';
-          if (stristr($months, $isQ) != FALSE){
+          if (stristr($months, $isQ) != FALSE) {
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
               '#attributes' => [
-                'class' => ['reports','qtd-input'],
+                'class' => ['reports', 'qtd-input'],
                 'data-qtd' => $months,
               ],
               '#step' => '0.01',
@@ -330,25 +366,26 @@ class TableGenerate extends FormBase {
             $b++;
             $qtd++;
           }
-          elseif(stristr($months,$isYTD) == 'YTD')  {
+          elseif (stristr($months, $isYTD) == 'YTD') {
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
               '#attributes' => [
-                'class' => ['reports', 'year-input', ],
+                'class' => ['reports', 'year-input',],
               ],
               '#step' => '0.01',
             ];
             $b++;
-          }else{
+          }
+          else {
             $form[$table_name][$index][$months] = [
               '#type' => 'number',
               '#required' => FALSE,
               '#attributes' => [
-               'class' => ['month-input'],
-               'data-month' => $b,
-               'data-qtd' => 'Q' . $qtd,
-            ],
+                'class' => ['month-input'],
+                'data-month' => $b,
+                'data-qtd' => 'Q' . $qtd,
+              ],
               '#step' => '0.01',
             ];
             $b++;
